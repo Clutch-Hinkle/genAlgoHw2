@@ -22,7 +22,6 @@ public class Chromo
 /*******************************************************************************
 *                            INSTANCE VARIABLES                                *
 *******************************************************************************/
-
 private static double randnum;
 
 /*******************************************************************************
@@ -37,9 +36,18 @@ private static double randnum;
 			tmp[i] = i;
 		}
 		
-		//Doesnt work :(
-		Collections.shuffle(Arrays.asList(tmp));
-		chromo = tmp;
+		List<Integer> intList = new ArrayList<Integer>(tmp.length);
+
+    	for (int i : tmp)
+    	{
+      		intList.add(i);
+    	}
+
+		Collections.shuffle(intList);
+
+		int[] x = intList.stream().mapToInt(i->i).toArray();
+
+		this.chromo = x;
 
 		this.rawFitness = -1;   //  Fitness not yet evaluated
 		this.sclFitness = -1;   //  Fitness not yet scaled
@@ -61,7 +69,20 @@ private static double randnum;
 
 		switch (Parameters.mutationType){
 
-		case 1:     //  Replace with new random number
+		case 1: // Swap two indices
+
+			// get two random indices that are not matching
+			int i = Search.r.nextInt(48);
+			int j = i;
+			while (i == j)
+			{
+				j = Search.r.nextInt(48);
+			}
+
+			// Swaps them
+			int tmp = this.chromo[i];
+			this.chromo[i] = this.chromo[j];
+			this.chromo[j] = tmp;
 
 			break;
 
