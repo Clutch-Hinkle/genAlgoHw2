@@ -225,30 +225,33 @@ public class Search {
 					}
 				}
 
+				stdevRawFitness = Math.sqrt(
+						Math.abs(sumRawFitness2 -
+								sumRawFitness*sumRawFitness/Parameters.popSize)
+								/
+								(Parameters.popSize-1)
+				);
+
 				// Accumulate fitness statistics
 				fitnessStats[0][G] += sumRawFitness / Parameters.popSize;
 				fitnessStats[1][G] += bestOfGenChromo.rawFitness;
+				fitnessStats[2][G] += stdevRawFitness;
 
 				averageRawFitness = sumRawFitness / Parameters.popSize;
-				stdevRawFitness = Math.sqrt(
-							Math.abs(sumRawFitness2 - 
-							sumRawFitness*sumRawFitness/Parameters.popSize)
-							/
-							(Parameters.popSize-1)
-							);
+
 
 				// Output generation statistics to screen
 				System.out.println(R + "\t" + G +  "\t" + (int)bestOfGenChromo.rawFitness + "\t" + averageRawFitness + "\t" + stdevRawFitness);
 
 				// Output generation statistics to summary file
-				summaryOutput.write(" R ");
+				/*summaryOutput.write(" R ");
 				Hwrite.right(R, 3, summaryOutput);
 				summaryOutput.write(" G ");
 				Hwrite.right(G, 3, summaryOutput);
 				Hwrite.right((int)bestOfGenChromo.rawFitness, 7, summaryOutput);
 				Hwrite.right(averageRawFitness, 11, 3, summaryOutput);
 				Hwrite.right(stdevRawFitness, 11, 3, summaryOutput);
-				summaryOutput.write("\n");
+				summaryOutput.write("\n");*/
 
 
 		// *********************************************************************
@@ -381,10 +384,10 @@ public class Search {
 
 			} //  Repeat the above loop for each generation
 
-			Hwrite.left(bestOfRunR, 4, summaryOutput);
-			Hwrite.right(bestOfRunG, 4, summaryOutput);
+			//Hwrite.left(bestOfRunR, 4, summaryOutput);
+			//Hwrite.right(bestOfRunG, 4, summaryOutput);
 
-			problem.doPrintGenes(bestOfRunChromo, summaryOutput);
+			//problem.doPrintGenes(bestOfRunChromo, summaryOutput);
 
 			System.out.println(R + "\t" + "B" + "\t"+ (int)bestOfRunChromo.rawFitness);
 
@@ -395,11 +398,12 @@ public class Search {
 		problem.doPrintGenes(bestOverAllChromo, summaryOutput);
 
 		//	Output Fitness Statistics matrix
-		summaryOutput.write("Gen                 AvgFit              BestFit \n");
+		summaryOutput.write("Gen                 AvgFit              BestFit			AvgStd\n");
 		for (int i=0; i<Parameters.generations; i++){
 			Hwrite.left(i, 15, summaryOutput);
 			Hwrite.left(fitnessStats[0][i]/Parameters.numRuns, 20, 2, summaryOutput);
 			Hwrite.left(fitnessStats[1][i]/Parameters.numRuns, 20, 2, summaryOutput);
+			Hwrite.left(fitnessStats[2][i]/Parameters.numRuns, 20, 2, summaryOutput);
 			summaryOutput.write("\n");
 		}
 
