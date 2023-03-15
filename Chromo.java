@@ -23,6 +23,8 @@ public class Chromo
 *                            INSTANCE VARIABLES                                *
 *******************************************************************************/
 
+public static Random r = new Random();
+
 private static double randnum;
 
 /*******************************************************************************
@@ -37,9 +39,18 @@ private static double randnum;
 			tmp[i] = i;
 		}
 		
-		//Doesnt work :(
-		Collections.shuffle(Arrays.asList(tmp));
-		chromo = tmp;
+		List<Integer> intList = new ArrayList<Integer>(tmp.length);
+		
+    	for (int i : tmp)
+    	{
+      		intList.add(i);
+    	}
+
+		Collections.shuffle(intList);
+
+		int[] x = intList.stream().mapToInt(i->i).toArray();
+
+		chromo = x;
 
 		this.rawFitness = -1;   //  Fitness not yet evaluated
 		this.sclFitness = -1;   //  Fitness not yet scaled
