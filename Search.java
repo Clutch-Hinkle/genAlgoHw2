@@ -374,7 +374,11 @@ public class Search {
 
 				//	Mutate Children
 				for (int i=0; i<Parameters.popSize; i++){
-					child[i].doMutation();
+
+					randnum = r.nextDouble();
+					
+					if (randnum < Parameters.mutationRate)
+						child[i].doMutation();
 				}
 
 				//	Swap Children with Last Generation
