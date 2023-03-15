@@ -41,7 +41,6 @@ private static double randnum;
 		Collections.shuffle(Arrays.asList(tmp));
 		chromo = tmp;
 
-
 		this.rawFitness = -1;   //  Fitness not yet evaluated
 		this.sclFitness = -1;   //  Fitness not yet scaled
 		this.proFitness = -1;   //  Fitness not yet proportionalized
