@@ -136,14 +136,15 @@ private static double randnum;
 		switch (Parameters.xoverType){
 
 		case 1:     //  Single Point Crossover
-			partiallyMappedCrossOver(parent1, parent2, child1, child2);
+
 
 		case 2:     //  Two Point Crossover
-
+			partiallyMappedCrossOver(parent1, parent2, child1, child2);
 		case 3:     //  Uniform Crossover
 
 		default:
-			System.out.println("ERROR - Bad crossover method selected");
+			System.out.println("ERROR - Bad crossover method selected. Defaulting to PMX");
+			partiallyMappedCrossOver(parent1, parent2, child1, child2);
 		}
 
 		//  Set fitness values back to zero

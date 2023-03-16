@@ -73,7 +73,10 @@ public class Search {
             // Read the data
             int i = 0;
             while (scanner.hasNextLine()) {
+				//System.out.println("I is " + i);
                 String[] columns = scanner.nextLine().split(" ");
+
+
                 cityArray[i][0] = Double.parseDouble(columns[1]);
                 cityArray[i][1] = Double.parseDouble(columns[2]);
                 i++;
@@ -107,7 +110,7 @@ public class Search {
 		parmValues.outputParameters(summaryOutput);
 
 	//	Set up Fitness Statistics matrix
-		fitnessStats = new double[2][Parameters.generations];
+		fitnessStats = new double[3][Parameters.generations];
 		for (int i=0; i<Parameters.generations; i++){
 			fitnessStats[0][i] = 0;
 			fitnessStats[1][i] = 0;
