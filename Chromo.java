@@ -135,10 +135,10 @@ private static double randnum;
 
 		switch (Parameters.xoverType){
 
-		case 1:     //  Single Point Crossover
+		case 1:     //  OX Crossover
 
 
-		case 2:     //  Two Point Crossover
+		case 2:     //  PMX Crossover
 			partiallyMappedCrossOver(parent1, parent2, child1, child2);
 		case 3:     //  Uniform Crossover
 
@@ -307,6 +307,71 @@ private static double randnum;
 			child1.chromo[child1Index] = child2.chromo[child2Index];
 			child2.chromo[child2Index] = temp;
 		}
+
+	}
+
+	public static void OXCrossover(Chromo parent1, Chromo parent2, Chromo child1, Chromo child2)
+	{
+		// Grab two random indexes
+		int l = Search.r.nextInt(48);
+		int r = l;
+		while (l == r)
+		{
+			r = Search.r.nextInt(48);
+		}
+
+		// make sure l is the lower number
+		if (l > r)
+		{
+			int tmp = l;
+			l = r;
+			r = tmp;
+		}
+
+		// Create hashmaps to keep track of what values have been used
+		Hashtable<Integer, Boolean> child1Lookup = new Hashtable<Integer, Boolean>();
+		Hashtable<Integer, Boolean> child2Lookup = new Hashtable<Integer, Boolean>();
+
+		for (int i = l; i<=r; i++)
+		{
+			child1.chromo[i] = parent1.chromo[i];
+			child1Lookup.put(parent1.chromo[i], true);
+
+			child2.chromo[i] = parent2.chromo[i];
+			child2Lookup.put(parent2.chromo[i], true);
+		}
+
+		// Starting from the right of the substring fill in from the other parent
+		int p1 = 0;
+		int p2 = 0;
+		for (int i = r + 1; i != l; i++)
+		{
+			// if were at the end of the array go back to the beginning
+			if (i == 48){
+				i = 0;
+				if (i == l)
+          			break;
+			}
+
+			while(child1Lookup.containsKey(parent2.chromo[p2]))
+			{
+				p2 += 1;
+			}
+
+			while(child2Lookup.containsKey(parent1.chromo[p1]))
+			{
+				p1 += 1;
+			}
+
+			child1.chromo[i] = parent2.chromo[p2];
+			child1Lookup.put(child1.chromo[i], true);
+
+			child2.chromo[i] = parent1.chromo[p1];
+			child2Lookup.put(child2.chromo[i], true);
+
+
+		}
+
 
 	}
 
