@@ -179,4 +179,65 @@ private static double randnum;
 		return;
 	}
 
+	public static void partiallyMappedCrossOver(Chromo parent1, Chromo parent2, Chromo child1, Chromo child2)
+	{
+		int minDist = 2;
+		//Choose a random chunk size not equal to the chromo length
+		int chunkSize = Search.r.nextInt((parent1.chromo.length - 2) - minDist) + minDist;
+		//get the left index Random(0, chromoLength - chunk)
+		int leftIndex = Search.r.nextInt(0, (parent1.chromo.length - 1) - chunkSize);
+		//Get the right index left + chunkSize - 1
+		int rightIndex = leftIndex + chunkSize - 1;
+
+		//Read all of the chromosome values to a values left table
+		Hashtable<Integer, Boolean> valuesLeft = new Hashtable<Integer, Boolean>();
+		for (int i = 0; i < parent1.chromo.length; i++)
+		{
+			valuesLeft.put(parent1.chromo[i], true);
+		}
+
+		//Copy the values within left and right of parent1 to child removing them from values left
+		for (int i = leftIndex; i < rightIndex; i++)
+		{
+			child1.chromo[i] = parent1.chromo[i];
+			valuesLeft.remove(parent1.chromo[i]);
+		}
+
+		//Mapping index to value
+		Hashtable<Integer, Integer> parent2Remaining = new Hashtable<Integer, Integer>();
+		//Figure out which values of parent 2 are still in values left
+		for (int i = 0; i < parent2.chromo.length; i++)
+		{
+			if (valuesLeft.containsKey(parent2.chromo[i]))
+			{
+				//Store both the index and the value
+				parent2Remaining.put(i, parent2.chromo[i]);
+			}
+		}
+
+		//For each of the values
+		for (Map.Entry<Integer, Integer> set : parent2Remaining.entrySet())
+		{
+			int index = set.getKey();
+			int city = set.getValue();
+
+			// 1. get the value (city) in parent 1 using parent 2 index
+			int par1Val = parent1.chromo[index];
+
+			//Locate this same value in parent 2
+			for (int i = 0; i < parent2.chromo.length; i++)
+			{
+				System.out.println("Not implemented");
+			}
+		}
+
+
+			//if the index of this value falls in our chunk.
+				//Repeat from 1 using this value
+			//else just add it to the child at this index.
+		//Copy any remaining positions in parent two to the child.
+
+
+	}
+
 }   // End of Chromo.java ******************************************************
