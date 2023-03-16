@@ -136,6 +136,7 @@ private static double randnum;
 		switch (Parameters.xoverType){
 
 		case 1:     //  Single Point Crossover
+			partiallyMappedCrossOver(parent1, parent2, child1, child2);
 
 		case 2:     //  Two Point Crossover
 
@@ -184,59 +185,127 @@ private static double randnum;
 		int minDist = 2;
 		//Choose a random chunk size not equal to the chromo length
 		int chunkSize = Search.r.nextInt((parent1.chromo.length - 2) - minDist) + minDist;
+
+
 		//get the left index Random(0, chromoLength - chunk)
 		int leftIndex = Search.r.nextInt(0, (parent1.chromo.length - 1) - chunkSize);
 		//Get the right index left + chunkSize - 1
 		int rightIndex = leftIndex + chunkSize - 1;
 
-		//Read all of the chromosome values to a values left table
-		Hashtable<Integer, Boolean> valuesLeft = new Hashtable<Integer, Boolean>();
+		//System.out.println("Chunksize = " + chunkSize + " left index: " + leftIndex + " right index: " + rightIndex);
+
+		Hashtable<Integer, Boolean> child1Lookup = new Hashtable<Integer, Boolean>();
+
+
 		for (int i = 0; i < parent1.chromo.length; i++)
 		{
-			valuesLeft.put(parent1.chromo[i], true);
-		}
-
-		//Copy the values within left and right of parent1 to child removing them from values left
-		for (int i = leftIndex; i < rightIndex; i++)
-		{
+			//Lets add all the values to a lookup
 			child1.chromo[i] = parent1.chromo[i];
-			valuesLeft.remove(parent1.chromo[i]);
+			child1Lookup.put(parent1.chromo[i], true);
+			child2.chromo[i] = parent2.chromo[i];
+
 		}
 
-		//Mapping index to value
-		Hashtable<Integer, Integer> parent2Remaining = new Hashtable<Integer, Integer>();
-		//Figure out which values of parent 2 are still in values left
-		for (int i = 0; i < parent2.chromo.length; i++)
+
+		//Maintain duplicates
+		ArrayList<Integer> child1DuplicateIndex = new ArrayList<Integer>();
+
+
+
+		//Exchange our chunk of data
+		for (int i = leftIndex; i <= rightIndex; i++)
 		{
-			if (valuesLeft.containsKey(parent2.chromo[i]))
+			child1.chromo[i] = parent2.chromo[i];
+			child2.chromo[i] = parent1.chromo[i];
+
+			child1Lookup.remove(parent1.chromo[i]);
+
+			if (child1Lookup.containsKey(parent2.chromo[i]))
 			{
-				//Store both the index and the value
-				parent2Remaining.put(i, parent2.chromo[i]);
+				//Duplicate key
+				//System.out.println("We think " + parent2[i] + " is a duplicate value");
+				child1DuplicateIndex.add(i);
+			}
+
+			child1Lookup.put(parent2.chromo[i], true);
+
+		}
+
+
+		//Child 1 value to child 2 value
+		Hashtable<Integer, Integer> relationMap = new Hashtable<Integer, Integer>();
+
+		//Go through our duplicate indices to determine mapping relationship
+		for (int i = 0; i < child1DuplicateIndex.size(); i++)
+		{
+			int index = child1DuplicateIndex.get(i);
+
+
+			//If it doesn't have this value, nice. Just note the relation
+			if (!child1Lookup.containsKey(child2.chromo[index]))
+			{
+				relationMap.put(child1.chromo[index], child2.chromo[index]);
+			}
+			//Otherwise it already has this value to, so things are a little more tricky.
+			else
+			{
+				int child1StartingValue = child1.chromo[index];
+				while (child1Lookup.containsKey(child2.chromo[index]))
+				{
+					//Find the index of this value in child 1
+					for (int j = 0; j < child1.chromo.length; j++)
+					{
+						if (child1.chromo[j] == child2.chromo[index])
+						{
+							index = j;
+							break;
+						}
+					}
+				}
+
+				relationMap.put(child1StartingValue, child2.chromo[index]);
 			}
 		}
 
-		//For each of the values
-		for (Map.Entry<Integer, Integer> set : parent2Remaining.entrySet())
+
+		for (Map.Entry<Integer, Integer> set : relationMap.entrySet())
 		{
-			int index = set.getKey();
-			int city = set.getValue();
+			int child1Index = -1;
+			int child2Index = -1;
 
-			// 1. get the value (city) in parent 1 using parent 2 index
-			int par1Val = parent1.chromo[index];
+			//System.out.println("\n\nLooking for value " + set.getKey() + " in child 1 and looking for " + set.getValue() + " in child 2");
 
-			//Locate this same value in parent 2
-			for (int i = 0; i < parent2.chromo.length; i++)
+			for (int i = 0; i < child1.chromo.length; i++)
 			{
-				System.out.println("Not implemented");
+				//We need to skip everything in the swath
+				if (i >= leftIndex && i<=rightIndex)
+					continue;
+
+				//We found the location of our child 1
+				if (child1.chromo[i] == set.getKey())
+				{
+					child1Index = i;
+					if (child2Index != -1)
+						break;
+				}
+
+				if (child2.chromo[i] == set.getValue())
+				{
+					child2Index = i;
+					if (child1Index != -1)
+						break;
+				}
 			}
+			//we now have our index so lets swap
+			//System.out.println("Child1 Index = " + child1Index + " child2 index = " + child2Index);
+			//If its -1, they might not have been actual duplicates.
+			if (child1Index == -1 || child2Index == -1)
+				continue;
+
+			int temp = child1.chromo[child1Index];
+			child1.chromo[child1Index] = child2.chromo[child2Index];
+			child2.chromo[child2Index] = temp;
 		}
-
-
-			//if the index of this value falls in our chunk.
-				//Repeat from 1 using this value
-			//else just add it to the child at this index.
-		//Copy any remaining positions in parent two to the child.
-
 
 	}
 
