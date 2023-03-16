@@ -137,8 +137,10 @@ private static double randnum;
 
 		case 1:     //  OX Crossover
 			OXCrossover( parent1, parent2, child1, child2);
+			break;
 		case 2:     //  PMX Crossover
 			partiallyMappedCrossOver(parent1, parent2, child1, child2);
+			break;
 		case 3:     //  Uniform Crossover
 
 		default:
