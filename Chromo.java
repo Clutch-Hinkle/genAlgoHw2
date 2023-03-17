@@ -351,13 +351,18 @@ private static double randnum;
 		Hashtable<Integer, Boolean> child1Lookup = new Hashtable<Integer, Boolean>();
 		Hashtable<Integer, Boolean> child2Lookup = new Hashtable<Integer, Boolean>();
 
+		int[] par1 = parent1.chromo.clone();
+		int[] par2 = parent2.chromo.clone();
+		int[] ch1 = new int[48];
+		int[] ch2 = new int[48];
+
 		for (int i = l; i<=r; i++)
 		{
-			child1.chromo[i] = parent1.chromo[i];
-			child1Lookup.put(parent1.chromo[i], true);
+			ch1[i] = par1[i];
+			child1Lookup.put(par1[i], true);
 
-			child2.chromo[i] = parent2.chromo[i];
-			child2Lookup.put(parent2.chromo[i], true);
+			ch2[i] = par2[i];
+			child2Lookup.put(par2[i], true);
 		}
 
 		// Starting from the right of the substring fill in from the other parent
@@ -372,24 +377,42 @@ private static double randnum;
           			break;
 			}
 
-			while(child1Lookup.containsKey(parent2.chromo[p2]))
-			{
-				p2 += 1;
-			}
-
-			while(child2Lookup.containsKey(parent1.chromo[p1]))
+			while(child2Lookup.containsKey(par1[p1]))
 			{
 				p1 += 1;
 			}
 
-			child1.chromo[i] = parent2.chromo[p2];
-			child1Lookup.put(child1.chromo[i], true);
-
-			child2.chromo[i] = parent1.chromo[p1];
-			child2Lookup.put(child2.chromo[i], true);
+			ch2[i] = par1[p1];
+			child2Lookup.put(ch2[i], true);
 
 
 		}
+					
+		//System.out.println("child2 " +Arrays.toString(child2.chromo));
+
+		for (int i = r + 1; i != l; i++)
+		{
+			// if were at the end of the array go back to the beginning
+			if (i == 48){
+				i = 0;
+			}
+			if (i == l)
+          		break;
+
+			while(child1Lookup.containsKey(parent2.chromo[p2]))
+			{
+				p2 += 1;
+				
+			}
+
+			ch1[i] = par2[p2];
+			child1Lookup.put(ch1[i], true);
+
+		}
+
+		child1.chromo = ch1;
+		child2.chromo = ch2;
+
 
 
 	}
