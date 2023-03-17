@@ -107,7 +107,7 @@ public class Search {
 	//  Write Parameters To Summary Output File
 		String summaryFileName = Parameters.expID + "_summary.txt";
 		FileWriter summaryOutput = new FileWriter(summaryFileName);
-		parmValues.outputParameters(summaryOutput);
+		//parmValues.outputParameters(summaryOutput);
 
 	//	Set up Fitness Statistics matrix
 		fitnessStats = new double[3][Parameters.generations];
