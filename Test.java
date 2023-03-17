@@ -23,8 +23,54 @@ public class Test {
             System.out.print(parent2[i]);
         }
 
-        System.out.println();
         partiallyMappedCrossOver(parent1, parent2, child1, child2);
+
+        System.out.print("\nRunning mutation test :\n ");
+
+
+        int minDist = 2;
+        //Choose a random chunk size not equal to the chromo length
+        int chunkSize = Search.r.nextInt((parent1.length - 2) - minDist) + minDist;
+
+
+        //get the left index Random(0, chromoLength - chunk)
+        int leftIndex = Search.r.nextInt(0, (parent1.length - 1) - chunkSize);
+        //Get the right index left + chunkSize - 1
+        int rightIndex = leftIndex + chunkSize - 1;
+
+        System.out.println("Left index: " + leftIndex + " right index: " + rightIndex);
+        for (int i = 0; i < parent1.length; i++)
+        {
+            System.out.print(parent1[i] + ", ");
+        }
+
+
+        int[] subString = new int[chunkSize];
+
+        for (int index = leftIndex; index <= rightIndex; index++)
+        {
+            subString[index - leftIndex] = parent1[index];
+        }
+
+        for (int idx = 0; idx < subString.length / 2; idx++)
+        {
+            int temp = subString[idx];
+            subString[idx] = subString[subString.length - 1 - idx];
+            subString[subString.length - 1 - idx] = temp;
+        }
+
+        for (int index = leftIndex; index <= rightIndex; index++)
+        {
+            parent1[index] = subString[index - leftIndex];
+        }
+
+
+
+        System.out.println("\n");
+        for (int i = 0; i < parent1.length; i++)
+        {
+            System.out.print(parent1[i] + ", ");
+        }
 
 
     }

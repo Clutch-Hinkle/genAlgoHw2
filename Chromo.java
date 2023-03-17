@@ -88,7 +88,37 @@ private static double randnum;
 
 			break;
 
-		default:
+		case 2:
+			int minDist = 2;
+			//Choose a random chunk size not equal to the chromo length
+			int chunkSize = Search.r.nextInt((this.chromo.length - 2) - minDist) + minDist;
+
+			//get the left index Random(0, chromoLength - chunk)
+			int leftIndex = Search.r.nextInt(0, (this.chromo.length - 1) - chunkSize);
+			//Get the right index left + chunkSize - 1
+			int rightIndex = leftIndex + chunkSize - 1;
+
+			int[] subString = new int[chunkSize];
+
+			for (int index = leftIndex; index <= rightIndex; index++)
+			{
+				subString[index - leftIndex] = this.chromo[index];
+			}
+
+			for (int idx = 0; idx < subString.length / 2; idx++)
+			{
+				int temp = subString[idx];
+				subString[idx] = subString[subString.length - 1 - idx];
+				subString[subString.length - 1 - idx] = temp;
+			}
+
+			for (int index = leftIndex; index <= rightIndex; index++)
+			{
+				this.chromo[index] = subString[index - leftIndex];
+			}
+
+
+			default:
 			System.out.println("ERROR - No mutation method selected");
 		}
 	}
