@@ -220,6 +220,8 @@ private static double randnum;
 			partiallyMappedCrossOver(parent1, parent2, child1, child2);
 			break;
 		case 3:     //  Uniform Crossover
+			alternatingPositionCrossover(parent1, parent2, child1, child2);
+			break;
 
 		default:
 			System.out.println("ERROR - Bad crossover method selected. Defaulting to PMX");
@@ -498,9 +500,14 @@ private static double randnum;
 		
 		//Create a hashmap to keep track of the child index values and positions.
 		Hashtable<Integer, Boolean> child1aLookup = new Hashtable<Integer, Boolean>(); 
-		Hashtable<Integer, Boolean> child2bLookup = new Hashtable<Integer, Boolean>(); 
+		Hashtable<Integer, Boolean> child2bLookup = new Hashtable<Integer, Boolean>();
 
-		for(int i = 0; i <= parent1.chromo.length; i++)
+		int [] par1 = parent1.chromo.clone();
+		int [] par2 = parent2.chromo.clone();
+		int [] chd1 = par1.clone();
+		int [] chd2 = par2.clone();
+
+		for(int i = 0; i < par1.length; i++)
 		/*implement the check condition to check for duplicate values between the child chromo index 
 		and the parent chromo index it should check the individual index value 
 		of the child array against all values of both parent arrays and if duplicate do not insert that index value into
@@ -510,7 +517,7 @@ private static double randnum;
 			//loop through all parent index values each time to check for duplicate values in the child
 			for(int k = 0; k < parent1.chromo.length; k++)
 		{
-			if(child1.chromo[i] == parent1.chromo[k] || child1.chromo[i] == parent2.chromo[k])
+			if(chd1[i] == par1[k] || chd1[i] == par2[k])
 			break;
 			//do not continue with the insertion
 			else
@@ -519,26 +526,26 @@ private static double randnum;
 			{
 				//want to assign parent 1 to the even index positions
 				//push parent index values into the child stack
-				child1aLookup.put(parent1.chromo[i], true);
-				child2.chromo[i] = parent1.chromo[i];
+				child1aLookup.put(par1[i], true);
+				chd2[i] = par1[i];
 			}
 			//check for if position index is odd by !even condition
 			else
 			//else condition assign parent 2 to the odd index postions 
-			child1aLookup.put(parent2.chromo[i], true);
-			child2.chromo[i] = parent2.chromo[i];
+			child1aLookup.put(par2[i], true);
+			chd2[i] = par2[i];
 			}
 		}
 			
 
 		//perform the alternate position XO using the inverse relation of the parent chromos.
- 		for(int i = 0; i <= parent1.chromo.length; i++)
+ 		for(int i = 0; i < par1.length; i++)
 		{
 			//while(i <= child1.chromo.length)
 			//loop through all parent index values each time to check for duplicate values in the child
-			for(int k = 0; k < parent1.chromo.length; k++)
+			for(int k = 0; k < par1.length; k++)
 		{
-			if(child1.chromo[i] == parent1.chromo[k] || child1.chromo[i] == parent2.chromo[k])
+			if(chd1[i] == par1[k] || chd1[i] == par2[k])
 			break;
 			//do not continue with the insertion
 			else
@@ -547,14 +554,14 @@ private static double randnum;
 			{
 				//want to assign parent 1 to the even index positions
 				//push parent index values into the child stack
-				child2bLookup.put(parent2.chromo[i], true);
-				child2.chromo[i] = parent2.chromo[i];
+				child2bLookup.put(par2[i], true);
+				chd2[i] = par2[i];
 			}
 			//check for if position index is odd by !even condition
 			else
 			//else condition assign parent 2 to the odd index postions 
-			child2bLookup.put(parent1.chromo[i], true);
-			child2.chromo[i] = parent1.chromo[i];
+			child2bLookup.put(par1[i], true);
+			chd2[i] = par1[i];
 			}
 		}
 			
