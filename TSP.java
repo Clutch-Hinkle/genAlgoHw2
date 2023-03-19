@@ -71,9 +71,12 @@ public class TSP extends FitnessFunction{
 //  PRINT OUT AN INDIVIDUAL GENE TO THE SUMMARY FILE *********************************
 
 	public void doPrintGenes(Chromo X, FileWriter output) throws java.io.IOException{
+        Hwrite.right("[", 3, output);
         for (int i=0; i<X.chromo.length; i++){
-            Hwrite.right(X.chromo[i],3,output);
+            String temp = X.chromo[i] + ",";
+            Hwrite.right(temp,3,output);
         }
+        Hwrite.right("]", 3, output);
         output.write("\nRawFitness");
         Hwrite.right((int) X.rawFitness,13,output);
         output.write("\n\n");
