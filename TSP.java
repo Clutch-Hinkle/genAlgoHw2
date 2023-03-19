@@ -71,6 +71,11 @@ public class TSP extends FitnessFunction{
 
 	public void doPrintGenes(Chromo X, FileWriter output) throws java.io.IOException{
 
+        System.out.println();
+        for (int element: X.chromo) {
+            System.out.print(element + " ");
+        }
+
 		return;
 	}
 }
