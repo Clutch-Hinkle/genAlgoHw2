@@ -116,6 +116,7 @@ private static double randnum;
 			{
 				this.chromo[index] = subString[index - leftIndex];
 			}
+			break;
 
 
 			default:
