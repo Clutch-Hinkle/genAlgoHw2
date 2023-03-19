@@ -1,4 +1,5 @@
 import java.io.*;
+import java.sql.SQLOutput;
 import java.util.*;
 import java.text.*;
 
@@ -70,12 +71,13 @@ public class TSP extends FitnessFunction{
 //  PRINT OUT AN INDIVIDUAL GENE TO THE SUMMARY FILE *********************************
 
 	public void doPrintGenes(Chromo X, FileWriter output) throws java.io.IOException{
-
-        System.out.println();
-        for (int element: X.chromo) {
-            System.out.print(element + " ");
+        for (int i=0; i<X.chromo.length; i++){
+            Hwrite.right(X.chromo[i],3,output);
         }
+        output.write("\nRawFitness");
+        Hwrite.right((int) X.rawFitness,13,output);
+        output.write("\n\n");
+        return;
 
-		return;
 	}
 }

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -6,10 +7,12 @@ public class Test {
 
     public static void main(String[] args)
     {
-        int[] parent1 = new int[] { 8,5,7,3,6,2,5,1,9,0};
-        int[] parent2 = new int[] { 0,1,2,3,4,5,6,7,8,9};
-        int[] child1 = new int[10];
-        int[] child2 = new int[10];
+        //int[] parent1 = new int[] { 0, 1, 4, 12, 11, 3, 6, 13, 5, 10, 2, 9, 7, 8 };
+        //int[] parent2 = new int[] { 9, 4, 6, 3, 10, 0, 1, 5, 8, 2, 7, 12, 11, 13};
+        int[] parent1 = new int[] { 0, 1, 4, 12, 11, 17, 18, 19, 3, 6, 13, 5, 14, 15, 16, 10, 2, 9, 7, 8 };
+        int[] parent2 = new int[] { 14, 15, 16, 17, 18, 19, 9, 4, 6, 3, 10, 0, 1, 5, 8, 2, 7, 12, 11, 13};
+        int[] child1 = new int[20];
+        int[] child2 = new int[20];
         System.out.print("Running test with par1: ");
         for (int i = 0; i < parent1.length; i++)
         {
@@ -21,8 +24,65 @@ public class Test {
             System.out.print(parent2[i]);
         }
 
-        System.out.println();
         partiallyMappedCrossOver(parent1, parent2, child1, child2);
+
+        System.out.print("\nRunning mutation test :\n ");
+        System.out.println("\n");
+        for (int i = 0; i < parent1.length; i++)
+        {
+            System.out.print(parent1[i] + ", ");
+        }
+
+
+        ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
+
+        //Scramble mutation
+        for (int index = 0; index < parent1.length; index++)
+        {
+            //50 50 chance for selection
+            if (Search.r.nextDouble() <= .5)
+            {
+                //select a random subset of the string (Doesn't need to be contigious)
+                selectedIndices.add(index);
+            }
+
+        }
+
+
+        Collections.shuffle(selectedIndices);
+
+        int lastMoveValue = -1;
+        int[] chromoCopy = parent1.clone();
+
+        for (int index = 1; index <= selectedIndices.size(); index++)
+        {
+            //0 moves to 1, 1 moves to 0
+            int firstIndex = index - 1;
+            int secondIndex = index % selectedIndices.size();
+
+            //First index moves to second index
+            //This is our first move
+            if (lastMoveValue == -1)
+            {
+                lastMoveValue = chromoCopy[selectedIndices.get(secondIndex)];
+                chromoCopy[selectedIndices.get(secondIndex)] = chromoCopy[selectedIndices.get(firstIndex)];
+                continue;
+            }
+
+            int temp = chromoCopy[selectedIndices.get(secondIndex)];
+            chromoCopy[selectedIndices.get(secondIndex)] = lastMoveValue;
+            lastMoveValue = temp;
+        }
+
+        parent1 = chromoCopy;
+
+
+
+        System.out.println("\n");
+        for (int i = 0; i < parent1.length; i++)
+        {
+            System.out.print(parent1[i] + ", ");
+        }
 
 
     }
@@ -41,14 +101,15 @@ public class Test {
 
         System.out.println("Chunksize = " + chunkSize + " left index: " + leftIndex + " right index: " + rightIndex);
 
-        Hashtable<Integer, Boolean> child1Lookup = new Hashtable<Integer, Boolean>();
+        Hashtable<Integer, Boolean> child1NonChunkLookup = new Hashtable<Integer, Boolean>();
 
 
         for (int i = 0; i < parent1.length; i++)
         {
             //Lets add all the values to a lookup
             child1[i] = parent1[i];
-            child1Lookup.put(parent1[i], true);
+            if (i < leftIndex || i > rightIndex)
+                child1NonChunkLookup.put(parent1[i], true);
             child2[i] = parent2[i];
 
         }
@@ -65,16 +126,16 @@ public class Test {
             child1[i] = parent2[i];
             child2[i] = parent1[i];
 
-            child1Lookup.remove(parent1[i]);
 
-            if (child1Lookup.containsKey(parent2[i]))
+
+            if (child1NonChunkLookup.containsKey(parent2[i]))
             {
                 //Duplicate key
                 System.out.println("We think " + parent2[i] + " is a duplicate value");
                 child1DuplicateIndex.add(i);
             }
 
-            child1Lookup.put(parent2[i], true);
+            child1NonChunkLookup.put(parent2[i], true);
 
         }
 
@@ -84,7 +145,7 @@ public class Test {
         System.out.println("Our duplicates are ");
         for (int i = 0; i < child1DuplicateIndex.size(); i++)
         {
-            System.out.print(child1DuplicateIndex.get(i));
+            System.out.print(child1DuplicateIndex.get(i) + ", ");
         }
 
 
@@ -98,7 +159,7 @@ public class Test {
 
 
             //If it doesn't have this value, nice. Just note the relation
-            if (!child1Lookup.containsKey(child2[index]))
+            if (!child1NonChunkLookup.containsKey(child2[index]))
             {
                 relationMap.put(child1[index], child2[index]);
             }
@@ -106,13 +167,14 @@ public class Test {
             else
             {
                 int child1StartingValue = child1[index];
-                while (child1Lookup.containsKey(child2[index]))
+                while (child1NonChunkLookup.containsKey(child2[index]))
                 {
                     //Find the index of this value in child 1
                     for (int j = 0; j < child1.length; j++)
                     {
                         if (child1[j] == child2[index])
                         {
+                            //child1NonChunkLookup.remove(child2[index]);
                             index = j;
                             break;
                         }
@@ -126,12 +188,12 @@ public class Test {
         System.out.println("\nbefore repairs our children are ");
         for (int i = 0; i < child1.length; i++)
         {
-            System.out.print(child1[i]);
+            System.out.print(child1[i] + ", ");
         }
         System.out.print("\n");
         for (int i = 0; i < child2.length; i++)
         {
-            System.out.print(child2[i]);
+            System.out.print(child2[i] + ", ");
         }
 
         for (Map.Entry<Integer, Integer> set : relationMap.entrySet())
@@ -175,7 +237,7 @@ public class Test {
         System.out.print("\nThe new child is ");
         for (int i = 0; i < child1.length; i++)
         {
-            System.out.print(child1[i]);
+            System.out.print(child1[i] +", ");
         }
     }
 

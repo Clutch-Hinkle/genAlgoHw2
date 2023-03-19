@@ -47,6 +47,8 @@ private static double randnum;
 
 		int[] x = intList.stream().mapToInt(i->i).toArray();
 
+		System.out.println("\n\n\n");
+
 		this.chromo = x;
 
 		this.rawFitness = -1;   //  Fitness not yet evaluated
@@ -86,7 +88,83 @@ private static double randnum;
 
 			break;
 
-		default:
+		case 2:
+			int minDist = 2;
+			//Choose a random chunk size not equal to the chromo length
+			int chunkSize = Search.r.nextInt((this.chromo.length - 2) - minDist) + minDist;
+
+			//get the left index Random(0, chromoLength - chunk)
+			int leftIndex = Search.r.nextInt(0, (this.chromo.length - 1) - chunkSize);
+			//Get the right index left + chunkSize - 1
+			int rightIndex = leftIndex + chunkSize - 1;
+
+			int[] subString = new int[chunkSize];
+
+			for (int index = leftIndex; index <= rightIndex; index++)
+			{
+				subString[index - leftIndex] = this.chromo[index];
+			}
+
+			for (int idx = 0; idx < subString.length / 2; idx++)
+			{
+				int temp = subString[idx];
+				subString[idx] = subString[subString.length - 1 - idx];
+				subString[subString.length - 1 - idx] = temp;
+			}
+
+			for (int index = leftIndex; index <= rightIndex; index++)
+			{
+				this.chromo[index] = subString[index - leftIndex];
+			}
+			break;
+
+			case 3:
+
+				ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
+
+				//Scramble mutation
+				for (int index = 0; index < this.chromo.length; index++)
+				{
+					//50 50 chance for selection
+					if (Search.r.nextDouble() <= .5)
+					{
+						//select a random subset of the string (Doesn't need to be contigious)
+						selectedIndices.add(index);
+					}
+
+				}
+
+
+				Collections.shuffle(selectedIndices);
+
+				int lastMoveValue = -1;
+				int[] chromoCopy = this.chromo.clone();
+
+				for (int index = 1; index <= selectedIndices.size(); index++)
+				{
+					//0 moves to 1, 1 moves to 0
+					int firstIndex = index - 1;
+					int secondIndex = index % selectedIndices.size();
+
+					//First index moves to second index
+					//This is our first move
+					if (lastMoveValue == -1)
+					{
+						lastMoveValue = chromoCopy[selectedIndices.get(secondIndex)];
+						chromoCopy[selectedIndices.get(secondIndex)] = chromoCopy[selectedIndices.get(firstIndex)];
+						continue;
+					}
+
+					int temp = chromoCopy[selectedIndices.get(secondIndex)];
+					chromoCopy[selectedIndices.get(secondIndex)] = lastMoveValue;
+					lastMoveValue = temp;
+				}
+
+				this.chromo = chromoCopy;
+
+				break;
+
+			default:
 			System.out.println("ERROR - No mutation method selected");
 		}
 	}
@@ -182,15 +260,21 @@ private static double randnum;
 		return;
 	}
 
-	public static void partiallyMappedCrossOver(Chromo parent1, Chromo parent2, Chromo child1, Chromo child2)
+	public static void partiallyMappedCrossOver(Chromo parent1Act, Chromo parent2Act, Chromo child1Act, Chromo child2Act)
 	{
+		int [] parent1 = parent1Act.chromo.clone();
+		int [] parent2 = parent2Act.chromo.clone();
+		int [] child1 = parent1.clone();
+		int [] child2 = parent2.clone();
+
+
 		int minDist = 2;
 		//Choose a random chunk size not equal to the chromo length
-		int chunkSize = Search.r.nextInt((parent1.chromo.length - 2) - minDist) + minDist;
+		int chunkSize = Search.r.nextInt((parent1.length - 2) - minDist) + minDist;
 
 
 		//get the left index Random(0, chromoLength - chunk)
-		int leftIndex = Search.r.nextInt(0, (parent1.chromo.length - 1) - chunkSize);
+		int leftIndex = Search.r.nextInt(0, (parent1.length - 1) - chunkSize);
 		//Get the right index left + chunkSize - 1
 		int rightIndex = leftIndex + chunkSize - 1;
 
@@ -199,12 +283,13 @@ private static double randnum;
 		Hashtable<Integer, Boolean> child1Lookup = new Hashtable<Integer, Boolean>();
 
 
-		for (int i = 0; i < parent1.chromo.length; i++)
+		for (int i = 0; i < parent1.length; i++)
 		{
 			//Lets add all the values to a lookup
-			child1.chromo[i] = parent1.chromo[i];
-			child1Lookup.put(parent1.chromo[i], true);
-			child2.chromo[i] = parent2.chromo[i];
+			child1[i] = parent1[i];
+			if (i < leftIndex || i > rightIndex)
+				child1Lookup.put(parent1[i], true);
+			child2[i] = parent2[i];
 
 		}
 
@@ -217,19 +302,18 @@ private static double randnum;
 		//Exchange our chunk of data
 		for (int i = leftIndex; i <= rightIndex; i++)
 		{
-			child1.chromo[i] = parent2.chromo[i];
-			child2.chromo[i] = parent1.chromo[i];
+			child1[i] = parent2[i];
+			child2[i] = parent1[i];
 
-			child1Lookup.remove(parent1.chromo[i]);
 
-			if (child1Lookup.containsKey(parent2.chromo[i]))
+			if (child1Lookup.containsKey(parent2[i]))
 			{
 				//Duplicate key
 				//System.out.println("We think " + parent2[i] + " is a duplicate value");
 				child1DuplicateIndex.add(i);
 			}
 
-			child1Lookup.put(parent2.chromo[i], true);
+			child1Lookup.put(parent2[i], true);
 
 		}
 
@@ -244,28 +328,32 @@ private static double randnum;
 
 
 			//If it doesn't have this value, nice. Just note the relation
-			if (!child1Lookup.containsKey(child2.chromo[index]))
+			if (!child1Lookup.containsKey(child2[index]))
 			{
-				relationMap.put(child1.chromo[index], child2.chromo[index]);
+				relationMap.put(child1[index], child2[index]);
 			}
 			//Otherwise it already has this value to, so things are a little more tricky.
 			else
 			{
-				int child1StartingValue = child1.chromo[index];
-				while (child1Lookup.containsKey(child2.chromo[index]))
+				int child1StartingValue = child1[index];
+				while (child1Lookup.containsKey(child2[index]))
 				{
+					//System.out.println("While looping " + child2.chromo[index]);
 					//Find the index of this value in child 1
-					for (int j = 0; j < child1.chromo.length; j++)
+					for (int j = 0; j < child1.length; j++)
 					{
-						if (child1.chromo[j] == child2.chromo[index])
+
+						if (child1[j] == child2[index])
 						{
+							//System.out.println("Found " + child1.chromo[j]);
+							//child1Lookup.remove(child2.chromo[index]);
 							index = j;
 							break;
 						}
 					}
 				}
 
-				relationMap.put(child1StartingValue, child2.chromo[index]);
+				relationMap.put(child1StartingValue, child2[index]);
 			}
 		}
 
@@ -277,21 +365,21 @@ private static double randnum;
 
 			//System.out.println("\n\nLooking for value " + set.getKey() + " in child 1 and looking for " + set.getValue() + " in child 2");
 
-			for (int i = 0; i < child1.chromo.length; i++)
+			for (int i = 0; i < child1.length; i++)
 			{
 				//We need to skip everything in the swath
 				if (i >= leftIndex && i<=rightIndex)
 					continue;
 
 				//We found the location of our child 1
-				if (child1.chromo[i] == set.getKey())
+				if (child1[i] == set.getKey())
 				{
 					child1Index = i;
 					if (child2Index != -1)
 						break;
 				}
 
-				if (child2.chromo[i] == set.getValue())
+				if (child2[i] == set.getValue())
 				{
 					child2Index = i;
 					if (child1Index != -1)
@@ -304,10 +392,13 @@ private static double randnum;
 			if (child1Index == -1 || child2Index == -1)
 				continue;
 
-			int temp = child1.chromo[child1Index];
-			child1.chromo[child1Index] = child2.chromo[child2Index];
-			child2.chromo[child2Index] = temp;
+			int temp = child1[child1Index];
+			child1[child1Index] = child2[child2Index];
+			child2[child2Index] = temp;
 		}
+
+		child1Act.chromo = child1;
+		child2Act.chromo = child2;
 
 	}
 
