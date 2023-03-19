@@ -18,13 +18,13 @@ Calculate
 
 def main():
     print("hello world")
-    generationsRep1 = getFileContents("TSPSwapPMX_summary.txt")
-    generationsRep2 = getFileContents("TSPSwapOXX_summary.txt")
-    #generationsRep3 = getFileContents("n-pointsPolar800n=5_summary.txt")
+    generationsRep1 = getFileContents("TSPPMXSwap_summary.txt")
+    generationsRep2 = getFileContents("TSPPMXRegionInversion_summary.txt")
+    generationsRep3 = getFileContents("TSPPMXScramble_summary.txt")
     bestFitValues1 = getListOfValues(generationsRep1, 2)
     bestFitValues2 = getListOfValues(generationsRep2, 2)
-    #bestFitValues3 = getListOfValues(generationsRep3, 2)
-    graphMultiple(bestFitValues1, bestFitValues2, "Best Avg Fit Across 50 runs")
+    bestFitValues3 = getListOfValues(generationsRep3, 2)
+    graphMultiple(bestFitValues1, bestFitValues2, bestFitValues3, "Best Avg Fit Across 50 runs")
 
 
 #0 is generation #
@@ -43,17 +43,17 @@ def getListOfValues(generations, index):
     return retList
 
 
-def graphMultiple(listOne, listTwo, title):
+def graphMultiple(listOne, listTwo, listThree, title):
     y = np.array(listOne)
     y2 = np.array(listTwo)
-    #y3 = np.array(listThree)
+    y3 = np.array(listThree)
     x = np.array(range(len(listOne)))
 
     fig, ax = plt.subplots()
     plt.title(title)
-    ax.plot(x, y, label="PMX with Swap")
-    ax.plot(x, y2, label = "OXX with Swap")
-    #ax.plot(x, y3, label = "Polar RadThetaRadTheta...")
+    ax.plot(x, y, label="Swap with PMX")
+    ax.plot(x, y2, label = "Region Inversion with PMX")
+    ax.plot(x, y3, label = "Scramble with PMX")
 
     ax.set_xlabel("Generation")
     ax.set_ylabel("Avg Best Fit")

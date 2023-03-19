@@ -118,6 +118,51 @@ private static double randnum;
 			}
 			break;
 
+			case 3:
+
+				ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
+
+				//Scramble mutation
+				for (int index = 0; index < this.chromo.length; index++)
+				{
+					//50 50 chance for selection
+					if (Search.r.nextDouble() <= .5)
+					{
+						//select a random subset of the string (Doesn't need to be contigious)
+						selectedIndices.add(index);
+					}
+
+				}
+
+
+				Collections.shuffle(selectedIndices);
+
+				int lastMoveValue = -1;
+				int[] chromoCopy = this.chromo.clone();
+
+				for (int index = 1; index <= selectedIndices.size(); index++)
+				{
+					//0 moves to 1, 1 moves to 0
+					int firstIndex = index - 1;
+					int secondIndex = index % selectedIndices.size();
+
+					//First index moves to second index
+					//This is our first move
+					if (lastMoveValue == -1)
+					{
+						lastMoveValue = chromoCopy[selectedIndices.get(secondIndex)];
+						chromoCopy[selectedIndices.get(secondIndex)] = chromoCopy[selectedIndices.get(firstIndex)];
+						continue;
+					}
+
+					int temp = chromoCopy[selectedIndices.get(secondIndex)];
+					chromoCopy[selectedIndices.get(secondIndex)] = lastMoveValue;
+					lastMoveValue = temp;
+				}
+
+				this.chromo = chromoCopy;
+
+				break;
 
 			default:
 			System.out.println("ERROR - No mutation method selected");

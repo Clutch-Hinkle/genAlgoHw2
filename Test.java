@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -26,43 +27,54 @@ public class Test {
         partiallyMappedCrossOver(parent1, parent2, child1, child2);
 
         System.out.print("\nRunning mutation test :\n ");
-
-
-        int minDist = 2;
-        //Choose a random chunk size not equal to the chromo length
-        int chunkSize = Search.r.nextInt((parent1.length - 2) - minDist) + minDist;
-
-
-        //get the left index Random(0, chromoLength - chunk)
-        int leftIndex = Search.r.nextInt(0, (parent1.length - 1) - chunkSize);
-        //Get the right index left + chunkSize - 1
-        int rightIndex = leftIndex + chunkSize - 1;
-
-        System.out.println("Left index: " + leftIndex + " right index: " + rightIndex);
+        System.out.println("\n");
         for (int i = 0; i < parent1.length; i++)
         {
             System.out.print(parent1[i] + ", ");
         }
 
 
-        int[] subString = new int[chunkSize];
+        ArrayList<Integer> selectedIndices = new ArrayList<Integer>();
 
-        for (int index = leftIndex; index <= rightIndex; index++)
+        //Scramble mutation
+        for (int index = 0; index < parent1.length; index++)
         {
-            subString[index - leftIndex] = parent1[index];
+            //50 50 chance for selection
+            if (Search.r.nextDouble() <= .5)
+            {
+                //select a random subset of the string (Doesn't need to be contigious)
+                selectedIndices.add(index);
+            }
+
         }
 
-        for (int idx = 0; idx < subString.length / 2; idx++)
+
+        Collections.shuffle(selectedIndices);
+
+        int lastMoveValue = -1;
+        int[] chromoCopy = parent1.clone();
+
+        for (int index = 1; index <= selectedIndices.size(); index++)
         {
-            int temp = subString[idx];
-            subString[idx] = subString[subString.length - 1 - idx];
-            subString[subString.length - 1 - idx] = temp;
+            //0 moves to 1, 1 moves to 0
+            int firstIndex = index - 1;
+            int secondIndex = index % selectedIndices.size();
+
+            //First index moves to second index
+            //This is our first move
+            if (lastMoveValue == -1)
+            {
+                lastMoveValue = chromoCopy[selectedIndices.get(secondIndex)];
+                chromoCopy[selectedIndices.get(secondIndex)] = chromoCopy[selectedIndices.get(firstIndex)];
+                continue;
+            }
+
+            int temp = chromoCopy[selectedIndices.get(secondIndex)];
+            chromoCopy[selectedIndices.get(secondIndex)] = lastMoveValue;
+            lastMoveValue = temp;
         }
 
-        for (int index = leftIndex; index <= rightIndex; index++)
-        {
-            parent1[index] = subString[index - leftIndex];
-        }
+        parent1 = chromoCopy;
 
 
 
